@@ -35,43 +35,25 @@ async def on_ready():
     except Exception as e:
         print(f"Errore nella sincronizzazione: {e}")
 
-# --- SLASH COMMAND /WELCOME ---
-@bot.tree.command(name="welcome", description="Invia il messaggio ufficiale di benvenuto")
-async def welcome(interaction: discord.Interaction):
+# --- NUOVO SLASH COMMAND /MSG (FORMATTATO) ---
+@bot.tree.command(name="msg", description="Invia un messaggio formattato con il tuo testo")
+@app_commands.describe(testo="Il testo che vuoi appaia nell'embed")
+async def msg(interaction: discord.Interaction, testo: str):
+    # Questa riga permette di inserire a capo scrivendo \n nel messaggio
+    messaggio_formattato = testo.replace('\\n', '\n')
+
+    # Crea l'Embed (la cornice) con il tuo testo personalizzato
     embed = discord.Embed(
-        title="WELCOME",
-        description=(
-            f"{interaction.user.mention}\n\n"
-            "Preparati a vivere un'esperienza di simulazione senza precedenti su "
-            "**Emergency Response: Liberty County (ER:LC)**.\n\n"
-            "Nato a luglio del 2026 dall'ambizione e dall'amicizia di un piccolo gruppo di "
-            "fondatori, **Authentic Italian RolePlay** rinasce oggi più forte, solido e "
-            "appassionato che mai. Il nostro obiettivo? Portare su Roblox un **Roleplay "
-            "Statunitense** autentico, curato nei minimi dettagli e fedele in tutto e per tutto "
-            "alle dinamiche reali."
-        ),
-        color=discord.Color.from_rgb(255, 255, 255)
+        description=messaggio_formattato,
+        color=discord.Color.from_rgb(255, 255, 255) # Colore del bordo (Bianco)
     )
 
-    embed.set_thumbnail(url="https://i.imgur.com/8N4X0qG.png")
+    # --- OPZIONALE: Immagini ---
+    # Se vuoi anche il logo e il banner, togli il '#' dalle righe qui sotto e metti i link
+    # embed.set_thumbnail(url="LINK_DEL_TUO_LOGO")
+    # embed.set_image(url="LINK_DEL_TUO_BANNER")
 
-    embed.add_field(
-        name="Primi Passi: Come Iniziare",
-        value="> ***Verifica il tuo Account:** Collega il tuo profilo Roblox per sbloccare l'accesso al server. Trovi la procedura guidata nel canale: <#123456789012345678>*",
-        inline=False
-    )
-
-    embed.add_field(
-        name="Requisiti Importanti per Fare RP",
-        value=(
-            "• *Ottenere i **Documenti:** Richiedi la tua cittadinanza ufficiale compilando il modulo nel canale: <#123456789012345678>*\n"
-            "• *Studiare le **Regole:** La legge non ammette ignoranza! Leggi con attenzione i nostri tre Regolamenti Ufficiali per evitare sanzioni: <#123456789012345678>*"
-        ),
-        inline=False
-    )
-
-    embed.set_image(url="https://i.imgur.com/8N4X0qG.png")
-
+    # Invia l'Embed
     await interaction.response.send_message(embed=embed)
 
 # 3. Avvio Bot
