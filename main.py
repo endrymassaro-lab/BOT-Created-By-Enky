@@ -35,25 +35,19 @@ async def on_ready():
     except Exception as e:
         print(f"Errore nella sincronizzazione: {e}")
 
-# --- NUOVO SLASH COMMAND /MSG (FORMATTATO) ---
+# --- SLASH COMMAND /MSG (FORMATTATO CON BORDO ROSSO) ---
 @bot.tree.command(name="msg", description="Invia un messaggio formattato con il tuo testo")
 @app_commands.describe(testo="Il testo che vuoi appaia nell'embed")
 async def msg(interaction: discord.Interaction, testo: str):
-    # Questa riga permette di inserire a capo scrivendo \n nel messaggio
+    # Permette di andare a capo inserendo \n nel testo
     messaggio_formattato = testo.replace('\\n', '\n')
 
-    # Crea l'Embed (la cornice) con il tuo testo personalizzato
+    # Crea l'Embed con la riga laterale ROSSA
     embed = discord.Embed(
         description=messaggio_formattato,
-        color=discord.Color.from_rgb(255, 255, 255) # Colore del bordo (Bianco)
+        color=discord.Color.red()  # <--- Bordo di colore rosso
     )
 
-    # --- OPZIONALE: Immagini ---
-    # Se vuoi anche il logo e il banner, togli il '#' dalle righe qui sotto e metti i link
-    # embed.set_thumbnail(url="LINK_DEL_TUO_LOGO")
-    # embed.set_image(url="LINK_DEL_TUO_BANNER")
-
-    # Invia l'Embed
     await interaction.response.send_message(embed=embed)
 
 # 3. Avvio Bot
