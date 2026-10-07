@@ -5,7 +5,6 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-# 1. Web Server Flask
 app = Flask('')
 
 @app.route('/')
@@ -19,13 +18,11 @@ def keep_alive():
     t = Thread(target=run)
     t.start()
 
-# 2. Configurazione Bot Discord
 intents = discord.Intents.default()
 intents.message_content = True
 
 bot = commands.Bot(command_prefix='!', intents=intents)
 
-# --- POPUP MODAL PER SCRIVERE TESTI MULTILINEA ---
 class EmbedModal(discord.ui.Modal, title="Crea Messaggio Embed"):
     titolo_input = discord.ui.TextInput(
         label="Titolo",
@@ -36,17 +33,20 @@ class EmbedModal(discord.ui.Modal, title="Crea Messaggio Embed"):
 
     testo_input = discord.ui.TextInput(
         label="Contenuto del Messaggio",
-        style=discord.TextStyle.paragraph, # Permette l'uso di INVIO e testi multilinea
-        placeholder="Scrivi o incolla il tuo messaggio andando a capo liberamente...",
+        style=discord.TextStyle.paragraph,
+        placeholder="Incolla qui il codice o scrivi il testo andando a capo...",
         required=True,
         max_length=4000
     )
 
     async def on_submit(self, interaction: discord.Interaction):
+        # Racchiude il testo in un blocco di codice HTML per preservare gli spazi e gli a capo
+        testo_formattato = f"```html\n{self.testo_input.value}\n```"
+
         embed = discord.Embed(
             title=self.titolo_input.value,
-            description=self.testo_input.value,
-            color=discord.Color.red() # Bordo ROSSO
+            description=testo_formattato,
+            color=discord.Color.red()
         )
         await interaction.response.send_message(embed=embed)
 
@@ -59,12 +59,10 @@ async def on_ready():
     except Exception as e:
         print(f"Errore nella sincronizzazione: {e}")
 
-# --- SLASH COMMAND /MSG CHE APRE IL POPUP ---
 @bot.tree.command(name="msg", description="Apre la finestra per creare un messaggio formattato")
 async def msg(interaction: discord.Interaction):
     await interaction.response.send_modal(EmbedModal())
 
-# 3. Avvio Bot
 keep_alive()
 TOKEN = os.getenv("DISCORD_TOKEN")
 bot.run(TOKEN)
