@@ -66,3 +66,29 @@ async def msg(interaction: discord.Interaction):
 keep_alive()
 TOKEN = os.getenv("DISCORD_TOKEN")
 bot.run(TOKEN)
+class EmbedModal(discord.ui.Modal, title="Crea Messaggio Embed"):
+    def __init__(self):
+        super().__init__()
+
+    titolo_input = discord.ui.TextInput(
+        label="Titolo",
+        placeholder="Inserisci il titolo qui...",
+        required=True,
+        max_length=256
+    )
+
+    testo_input = discord.ui.TextInput(
+        label="Contenuto del Messaggio",
+        style=discord.TextStyle.paragraph,
+        placeholder="Scrivi o incolla il tuo testo...",
+        required=True,
+        max_length=4000
+    )
+
+    async def on_submit(self, interaction: discord.Interaction):
+        embed = discord.Embed(
+            title=self.titolo_input.value,
+            description=self.testo_input.value,
+            color=discord.Color.red()
+        )
+        await interaction.response.send_message(embed=embed)
