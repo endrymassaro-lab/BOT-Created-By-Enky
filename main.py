@@ -32,12 +32,15 @@ async def on_ready():
     except Exception as e:
         print(f"Errore nella sincronizzazione: {e}")
 
-@bot.tree.command(name="msg", description="Invia un messaggio formattato con il tuo testo")
-@app_commands.describe(testo="Il testo che vuoi appaia nell'embed")
-async def msg(interaction: discord.Interaction, testo: str):
-    messaggio_formattato = testo.replace('\\n', '\n')
+@bot.tree.command(name="msg", description="Invia un messaggio formattato con titolo e testo")
+@app_commands.describe(titolo="Il titolo in alto nell'embed", testo="Il corpo del messaggio")
+async def msg(interaction: discord.Interaction, titolo: str, testo: str):
+    # Converte i simboli \n scritti in chat in veri e propri a capo
+    testo_formattato = testo.replace('\\n', '\n')
+
     embed = discord.Embed(
-        description=messaggio_formattato,
+        title=titolo,
+        description=testo_formattato,
         color=discord.Color.red()
     )
     await interaction.response.send_message(embed=embed)
