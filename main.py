@@ -5,6 +5,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
+# 1. Web Server Flask
 app = Flask('')
 
 @app.route('/')
@@ -18,10 +19,36 @@ def keep_alive():
     t = Thread(target=run)
     t.start()
 
+# 2. Configurazione Bot Discord
 intents = discord.Intents.default()
 intents.message_content = True
 
 bot = commands.Bot(command_prefix='!', intents=intents)
+
+# --- POPUP MODAL PER SCRIVERE TESTI MULTILINEA ---
+class EmbedModal(discord.ui.Modal, title="Crea Messaggio Embed"):
+    titolo_input = discord.ui.TextInput(
+        label="Titolo",
+        placeholder="Inserisci il titolo qui...",
+        required=True,
+        max_length=256
+    )
+
+    testo_input = discord.ui.TextInput(
+        label="Contenuto del Messaggio",
+        style=discord.TextStyle.paragraph, # Permette l'uso di INVIO e testi multilinea
+        placeholder="Scrivi o incolla il tuo messaggio andando a capo liberamente...",
+        required=True,
+        max_length=4000
+    )
+
+    async def on_submit(self, interaction: discord.Interaction):
+        embed = discord.Embed(
+            title=self.titolo_input.value,
+            description=self.testo_input.value,
+            color=discord.Color.red() # Bordo ROSSO
+        )
+        await interaction.response.send_message(embed=embed)
 
 @bot.event
 async def on_ready():
@@ -32,19 +59,12 @@ async def on_ready():
     except Exception as e:
         print(f"Errore nella sincronizzazione: {e}")
 
-@bot.tree.command(name="msg", description="Invia un messaggio formattato con titolo e testo")
-@app_commands.describe(titolo="Il titolo in alto nell'embed", testo="Il corpo del messaggio")
-async def msg(interaction: discord.Interaction, titolo: str, testo: str):
-    # Converte i simboli \n scritti in chat in veri e propri a capo
-    testo_formattato = testo.replace('\\n', '\n')
+# --- SLASH COMMAND /MSG CHE APRE IL POPUP ---
+@bot.tree.command(name="msg", description="Apre la finestra per creare un messaggio formattato")
+async def msg(interaction: discord.Interaction):
+    await interaction.response.send_modal(EmbedModal())
 
-    embed = discord.Embed(
-        title=titolo,
-        description=testo_formattato,
-        color=discord.Color.red()
-    )
-    await interaction.response.send_message(embed=embed)
-
+# 3. Avvio Bot
 keep_alive()
 TOKEN = os.getenv("DISCORD_TOKEN")
 bot.run(TOKEN)
